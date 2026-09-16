@@ -1,0 +1,147 @@
+//Importa o hook useState da biblioteca React
+//ele permite armazenar valores e atualizar a tela automaticamente
+import { useState } from "react";
+
+//Cria o componente principal da aplicação
+function App() {
+
+
+  //estado responsável por armazenar a cidade digitada
+  const [cidade, setCidade] = useState("");
+
+  //estado Responsavel por armazenar a temperatura digitada
+  const [temperatura, setTemperatura] = useState ("");
+
+  //estado Responsavel por armazenar o clima digitado
+  const [clima, setClima] = useState ("");
+
+  //estado Responsavel por armazenar a umidade digitada
+  const [umidade, setUmidade] = useState ("");
+
+  //funcão executada quando o usuario clicar no botão consultar
+  function consultarClima () {
+
+    //Verifica se a cidade é são paulo
+    if (
+      cidade.toLocaleLowerCase() === "São Paulo" ||
+      cidade.toLocaleLowerCase() === "São Paulo" 
+
+    ) {
+      //atualiaza a temperatura
+      setTemperatura("24°");
+
+      //atualiza condição do clima
+      setClima("Ensolarado");
+
+      //atualiza a umidade
+      setUmidade("60%");
+  }
+
+  else if (cidade.toLocaleLowerCase() === "Coritiba") {
+
+    setTemperatura("17");
+
+    setClima("Chuvoso");
+
+    setUmidade("85%");
+  }
+
+  else if (cidade.toLocaleLowerCase() === "Rio de janeiro") {
+
+    setTemperatura("30");
+
+    setClima("Ensolarado");
+
+    setUmidade("40%");
+  }
+
+  else if (cidade.toLocaleLowerCase() === "Salvador") {
+
+    setTemperatura("35");
+
+    setClima("Ensolarado");
+
+    setUmidade("15%");
+  }
+
+  //executa caso a cidade não esteja cadastrada
+  else {
+
+    setTemperatura("--");
+
+    setClima("Cidade não cadastrada");
+
+    setUmidade("--");
+  }
+
+}
+
+//retorna a interface visual do sistema
+return (
+
+  //Container principal da aplicação
+  <div
+    style={{
+      padding: "20px",
+      fontfamily: "arial"
+    }}
+  >
+
+    {/* Titulo principal */}
+    <h1>Sistema de Previsão do Tempo</h1>
+
+    {/* Campo para digitação */}
+    <input
+
+    //tipo de campo
+    type="text"
+
+    //texto recebido dentro da caixa
+    placeholder="Digite uma cidade"
+
+    //valor vinculado ao estado cidade
+    value={cidade}
+
+    //Atualizar o estado quando o usuário digita
+    onChange={(e) => setCidade(e.target.value)}
+    />
+    {/* Botão de consulta */}
+    <button
+
+    ///executa a função consultarClima
+    onClick={consultarClima}
+
+    //Define a margem à esquerda
+    style={{
+      marginLeft: "10px"
+    }}
+    >
+      {/* Texto exibido no botão*/}
+      Consultar
+
+    </button>
+
+    {/* linha horizontal para separar as sessoes*/}
+    <hr />
+
+    {/* Exibe a cidade informada*/}
+    <h2>Cidade: {cidade}</h2>
+
+    {/* Exibe a temperatura*/}
+    <h2>Cidade: {temperatura}</h2>
+
+    {/* Exibe o clima*/}
+    <h2>Cidade: {Clima}</h2>
+
+    {/* Exibe a umidade*/}
+    <h2>Cidade: {Umidade}</h2>
+
+  </div>
+
+ 
+
+);
+}
+
+//exporta o componente App para ser utilizado no React
+export default App;
