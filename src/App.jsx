@@ -1,147 +1,155 @@
-//Importa o hook useState da biblioteca React
-//ele permite armazenar valores e atualizar a tela automaticamente
+//importa o arquivo css
+import "./App.css"
+
+//Importa hook useState da biblioteca react
+//Ele permite armazenar valores e atualizar a tela automaticamente
 import { useState } from "react";
 
 //Cria o componente principal da aplicação
 function App() {
 
-
-  //estado responsável por armazenar a cidade digitada
+  //Estado responsavel por armazenar a cidade digitada
   const [cidade, setCidade] = useState("");
 
-  //estado Responsavel por armazenar a temperatura digitada
-  const [temperatura, setTemperatura] = useState ("");
+  //Estado para armazenar a temperatura da cidade
+  const [temperatura, setTemperatura] = useState("");
 
-  //estado Responsavel por armazenar o clima digitado
-  const [clima, setClima] = useState ("");
+  //Estado para armazenar o clima da cidade
+  const [clima, setClima] = useState("");
 
-  //estado Responsavel por armazenar a umidade digitada
-  const [umidade, setUmidade] = useState ("");
+  //Estado par armazenar a umidade da cidade 
+  const [umidade, setUmidade] = useState("");
 
-  //funcão executada quando o usuario clicar no botão consultar
-  function consultarClima () {
+  //Estado que guarda o "tipo" de clima (usado pra trocar o tema visual)
+  //Valores possiveis: default, clear, clouds, rain, thunderstorm, snow, mist
+  const [tema, setTema] = useState("default");
 
-    //Verifica se a cidade é são paulo
-    if (
-      cidade.toLocaleLowerCase() === "São Paulo" ||
-      cidade.toLocaleLowerCase() === "São Paulo" 
+  //Estado de loading, pra dar um feedback visual enquanto busca
+  const [carregando, setCarregando] = useState(false);
 
-    ) {
-      //atualiaza a temperatura
-      setTemperatura("24°");
+  //Dicionário que traduz o "main" do clima (em inglês, vindo da API)
+  //pra um tema visual + emoji grande de fundo
+  const temasClima = {
+    Clear:        { tema: "clear",        icone: "☀️" },
+    Clouds:       { tema: "clouds",       icone: "☁️" },
+    Rain:         { tema: "rain",         icone: "🌧️" },
+    Drizzle:      { tema: "rain",         icone: "🌦️" },
+    Thunderstorm: { tema: "thunderstorm", icone: "⛈️" },
+    Snow:         { tema: "snow",         icone: "❄️" },
+    Mist:         { tema: "mist",         icone: "🌫️" },
+    Haze:         { tema: "mist",         icone: "🌫️" },
+    Fog:          { tema: "mist",         icone: "🌫️" },
+  };
 
-      //atualiza condição do clima
-      setClima("Ensolarado");
+  //Função executada quando o usuario clicar no botão consultar
+  async function consultarClima() {
 
-      //atualiza a umidade
-      setUmidade("60%");
+    //Verifica se o campo está vazio
+    if (cidade === "") {
+      alert("Digite uma cidade!");
+      return;
+    }
+
+    setCarregando(true);
+
+    try {
+
+      // Faz a requisicão da API
+      const resposta = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${cidade}&appid=31f8958534564fdb031369a754256658&units=metric&lang=pt_br`
+      );
+
+      // Converte a resposta para JSON
+      const dados = await resposta.json();
+
+      //Verifica se a cidade foi encontrada
+      if (dados.cod !== 200) {
+        alert("Cidade não encontrada!");
+        setCarregando(false);
+        return;
+      }
+
+      //Atualiza a temperatura
+      setTemperatura(Math.round(dados.main.temp) + "°C");
+
+      //Atualiza a condição climática
+      setClima(dados.weather[0].description);
+
+      //Atualiza a umidade
+      setUmidade(dados.main.humidity + "%");
+
+      //Define o tema visual com base no tipo de clima retornado
+      //Se não encontrar no dicionário, usa o tema "default"
+      const infoTema = temasClima[dados.weather[0].main] || { tema: "default", icone: "🌡️" };
+      setTema(infoTema.tema);
+
+    } catch (erro) {
+      console.log(erro);
+      alert("Erro ao consultar a API.");
+    } finally {
+      setCarregando(false);
+    }
+
   }
 
-  else if (cidade.toLocaleLowerCase() === "Coritiba") {
-
-    setTemperatura("17");
-
-    setClima("Chuvoso");
-
-    setUmidade("85%");
+  //Permite pesquisar apertando Enter no campo de texto
+  function aoPressionarTecla(e) {
+    if (e.key === "Enter") {
+      consultarClima();
+    }
   }
 
-  else if (cidade.toLocaleLowerCase() === "Rio de janeiro") {
+  //Retorna a interface visual do sistema
+  return (
+    // conteiner principal da aplicação — a classe muda o fundo conforme o clima
+    <div className={`app-container tema-${tema}`}>
 
-    setTemperatura("30");
+      {/* Emoji gigante decorativo ao fundo */}
+      <div className="icone-fundo">
+        {temasClima[
+          Object.keys(temasClima).find(k => temasClima[k].tema === tema)
+        ]?.icone || "🌤️"}
+      </div>
 
-    setClima("Ensolarado");
+      {/* Card central com efeito de vidro (glassmorphism) */}
+      <div className="card">
 
-    setUmidade("40%");
-  }
+        {/* Titulo Principal */}
+        <h1>☀️ Previsão do Tempo</h1>
 
-  else if (cidade.toLocaleLowerCase() === "Salvador") {
+        {/*Área de busca */}
+        <div className="busca">
 
-    setTemperatura("35");
+          {/*Campo para digitação */}
+          <input
+            type="text"
+            placeholder="Digite uma cidade"
+            value={cidade}
+            onChange={(e) => setCidade(e.target.value)}
+            onKeyDown={aoPressionarTecla}
+          />
 
-    setClima("Ensolarado");
+          {/*Botão de consulta */}
+          <button onClick={consultarClima} disabled={carregando}>
+            {carregando ? "Buscando..." : "Consultar"}
+          </button>
+        </div>
 
-    setUmidade("15%");
-  }
+        {/*Linha horizontal para separar seçoes */}
+        <hr />
 
-  //executa caso a cidade não esteja cadastrada
-  else {
+        {/*Resultados */}
+        <div className="resultado">
+          <p>🏙️ <strong>Cidade:</strong> {cidade || "—"}</p>
+          <p>🌡️ <strong>Temperatura:</strong> {temperatura || "—"}</p>
+          <p>☁️ <strong>Clima:</strong> {clima || "—"}</p>
+          <p>💧 <strong>Umidade:</strong> {umidade || "—"}</p>
+        </div>
 
-    setTemperatura("--");
-
-    setClima("Cidade não cadastrada");
-
-    setUmidade("--");
-  }
-
+      </div>
+    </div>
+  );
 }
 
-//retorna a interface visual do sistema
-return (
-
-  //Container principal da aplicação
-  <div
-    style={{
-      padding: "20px",
-      fontfamily: "arial"
-    }}
-  >
-
-    {/* Titulo principal */}
-    <h1>Sistema de Previsão do Tempo</h1>
-
-    {/* Campo para digitação */}
-    <input
-
-    //tipo de campo
-    type="text"
-
-    //texto recebido dentro da caixa
-    placeholder="Digite uma cidade"
-
-    //valor vinculado ao estado cidade
-    value={cidade}
-
-    //Atualizar o estado quando o usuário digita
-    onChange={(e) => setCidade(e.target.value)}
-    />
-    {/* Botão de consulta */}
-    <button
-
-    ///executa a função consultarClima
-    onClick={consultarClima}
-
-    //Define a margem à esquerda
-    style={{
-      marginLeft: "10px"
-    }}
-    >
-      {/* Texto exibido no botão*/}
-      Consultar
-
-    </button>
-
-    {/* linha horizontal para separar as sessoes*/}
-    <hr />
-
-    {/* Exibe a cidade informada*/}
-    <h2>Cidade: {cidade}</h2>
-
-    {/* Exibe a temperatura*/}
-    <h2>Cidade: {temperatura}</h2>
-
-    {/* Exibe o clima*/}
-    <h2>Cidade: {Clima}</h2>
-
-    {/* Exibe a umidade*/}
-    <h2>Cidade: {Umidade}</h2>
-
-  </div>
-
- 
-
-);
-}
-
-//exporta o componente App para ser utilizado no React
+//Exporta o componente App para ser utilizado no React
 export default App;

@@ -1,147 +1,206 @@
-//Importa o hook useState da biblioteca React
-//ele permite armazenar valores e atualizar a tela automaticamente
+//importa o arquivo css
+import "./App.css"
+
+//Importa hook useSatate da biblioteca react
+//Ele permite armazenar valores e atualizar a tela automaticamente
 import { useState } from "react";
 
-//Cria o componente principal da aplicação
+//Cria o componete pricipal da apliacação
 function App() {
 
-
-  //estado responsável por armazenar a cidade digitada
+  //Estado responsavel por armazenar a cidade digitada
   const [cidade, setCidade] = useState("");
 
-  //estado Responsavel por armazenar a temperatura digitada
-  const [temperatura, setTemperatura] = useState ("");
+  //Estado para armazenar a temperatura da cidade
+  const [temperatura, setTemperatura] = useState("");
 
-  //estado Responsavel por armazenar o clima digitado
-  const [clima, setClima] = useState ("");
+  //Estado para armazenar o clima da cidade
+  const [clima, setClima] = useState("");
 
-  //estado Responsavel por armazenar a umidade digitada
-  const [umidade, setUmidade] = useState ("");
+  //Estado par armazenar a umidade da cidade 
+  const [umidade, setUmidade] = useState("");
 
-  //funcão executada quando o usuario clicar no botão consultar
-  function consultarClima () {
+  //Função executada quando o usuario clicar no botão consultar
+  async function consultarClima() {
 
-    //Verifica se a cidade é são paulo
+    //Verifica se o campo está vazio
+    if(cidade === ""){
+      alert("Digite uma cidade!");
+      return;
+    }
+
+    try{
+
+      // Faz a requisicão da API
+      const resposta = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${cidade}&appid=31f8958534564fdb031369a754256658&units=metric&lang=pt_br`
+    );
+
+    // Converte a resposta para JSON
+    const dados = await resposta.json();
+
+    //Verifica se a cidade foi encontrada
+    if(dados.cod !== 200) {
+      alert("Cidade não encontrada!");
+      return;
+    }
+
+    //Atualiza a temperatura
+    setTemperatura(dados.main.temp + "°C");
+
+    //Atualiza a condição climática
+    setClima(dados.weather[0].description);
+
+    //Atualiza a umidade
+    setUmidade(dados.main.humidity + "%")
+      
+    } catch (erro) {
+      console.log(erro);
+      alert("Erro ao consultar a API.")
+    }
+
+  }
+
+  //Função executada quando o usuario clicar no botão consultar
+  /*function consultarClima() {
+
+    // Verifica se a cidade é são paulo
     if (
-      cidade.toLocaleLowerCase() === "São Paulo" ||
-      cidade.toLocaleLowerCase() === "São Paulo" 
-
+      cidade.toLowerCase() === "São Paulo" ||
+      cidade.toLowerCase() === "sao Paulo"
     ) {
-      //atualiaza a temperatura
-      setTemperatura("24°");
+      //Essa linha de codigo atualiza a temperatura
+      setTemperatura("24°C");
 
-      //atualiza condição do clima
+      //Atualiza a condição climatica
       setClima("Ensolarado");
 
-      //atualiza a umidade
+      //Atualiza a umidade
       setUmidade("60%");
+    }
+
+    else if (cidade.toLowerCase() === "coritiba") {
+
+      setTemperatura("17°G");
+
+      setClima("Chuvoso");
+
+      setUmidade("85%");
+
+    }
+
+    else if (cidade.toLowerCase() === "rio de janeiro") {
+
+      setTemperatura("32°G");
+
+      setClima("Ensolarado");
+
+      setUmidade("40%");
+
+    }
+
+    else if (cidade.toLowerCase() === "rio grande do sul") {
+
+      setTemperatura("10°G");
+
+      setClima("Parcialmente Nublado");
+
+      setUmidade("90%");
+
+    }
+
+    else if (cidade.toLowerCase() === "foz do iguaçu") {
+
+      setTemperatura("27°G");
+
+      setClima("Ensolarado");
+
+      setUmidade("70%");
+
+    }
+
+    else if (cidade.toLowerCase() === "bahia") {
+
+      setTemperatura("33°G");
+
+      setClima("Ensolarado");
+
+      setUmidade("30%");
+
+    }
+
+    //Executa caso a cidade não esteja cadastrada
+    else {
+
+      setTemperatura("--");
+
+      setClima("Cidade não cadastrada");
+
+      setUmidade("--");
+    }
   }
 
-  else if (cidade.toLocaleLowerCase() === "Coritiba") {
-
-    setTemperatura("17");
-
-    setClima("Chuvoso");
-
-    setUmidade("85%");
-  }
-
-  else if (cidade.toLocaleLowerCase() === "Rio de janeiro") {
-
-    setTemperatura("30");
-
-    setClima("Ensolarado");
-
-    setUmidade("40%");
-  }
-
-  else if (cidade.toLocaleLowerCase() === "Salvador") {
-
-    setTemperatura("35");
-
-    setClima("Ensolarado");
-
-    setUmidade("15%");
-  }
-
-  //executa caso a cidade não esteja cadastrada
-  else {
-
-    setTemperatura("--");
-
-    setClima("Cidade não cadastrada");
-
-    setUmidade("--");
-  }
-
-}
-
-//retorna a interface visual do sistema
-return (
-
-  //Container principal da aplicação
-  <div
-    style={{
-      padding: "20px",
-      fontfamily: "arial"
-    }}
-  >
-
-    {/* Titulo principal */}
-    <h1>Sistema de Previsão do Tempo</h1>
-
-    {/* Campo para digitação */}
-    <input
-
-    //tipo de campo
-    type="text"
-
-    //texto recebido dentro da caixa
-    placeholder="Digite uma cidade"
-
-    //valor vinculado ao estado cidade
-    value={cidade}
-
-    //Atualizar o estado quando o usuário digita
-    onChange={(e) => setCidade(e.target.value)}
-    />
-    {/* Botão de consulta */}
-    <button
-
-    ///executa a função consultarClima
-    onClick={consultarClima}
-
-    //Define a margem à esquerda
-    style={{
-      marginLeft: "10px"
-    }}
+  //Retorna a interface visual do sistema
+  */return (
+    // conteiner principal da aplicação
+    <div
+      style={{
+        pedding: "20px",
+        fontFamily: "Arial"
+      }}
     >
-      {/* Texto exibido no botão*/}
-      Consultar
+      {/* Titulo Principal */}
+      <h1>☀️Sistema de Preisão do Tempo</h1>
 
-    </button>
+      {/*Campo para digitação */}
+      <input
 
-    {/* linha horizontal para separar as sessoes*/}
-    <hr />
+        //Tipo de campo
+        type="text"
 
-    {/* Exibe a cidade informada*/}
-    <h2>Cidade: {cidade}</h2>
+        //Texto exibido dentro da caixa
+        placeholder="Digite uma cidade"
 
-    {/* Exibe a temperatura*/}
-    <h2>Cidade: {temperatura}</h2>
+        //Valor vinculado ao estado cidade
+        value={cidade}
 
-    {/* Exibe o clima*/}
-    <h2>Cidade: {Clima}</h2>
+        //Atualiza o estado quando o usuario digita
+        onChange={(e) => setCidade(e.target.value)}
+      />
+      {/*Botão de consulta */}
+      <button
 
-    {/* Exibe a umidade*/}
-    <h2>Cidade: {Umidade}</h2>
+        //Execulta a função consultarclima
+        onClick={consultarClima}
 
-  </div>
+        // Define a margem a esquerda
+        style={{
+          marginLeft: "10px"
+        }}
+      >
+        {/*Texto exibido no botão */}
+        Consultar
+      </button>
 
- 
+      {/*Linha horizontal para separar seçoes */}
+      <hr />
 
-);
+      {/*Exibe a cidade */}
+      <h2>🏙️Cidade: {cidade}</h2>
+
+      {/*Exibe a temperatura */}
+      <h2>🌡️Temperatura: {temperatura}</h2>
+
+      {/*Exibe o clima */}
+      <h2>☁️Clima: {clima}</h2>
+
+      {/*Exibe a umidade */}
+      <h2>💧Umidade: {umidade}</h2>
+
+    </div>
+
+  );
 }
 
-//exporta o componente App para ser utilizado no React
+//Exporta o componente App para ser utilizado no React
 export default App;
